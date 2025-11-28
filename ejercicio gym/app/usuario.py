@@ -40,7 +40,7 @@ def inicio_sistema():
 
     usuarios, contraseñas, roles = verificar()
     
-    print("Bienvenido a VitalGYM.")
+    print("\nBienvenido a VitalGYM.")
     
     usuario = inicio_usuario(usuarios)
     

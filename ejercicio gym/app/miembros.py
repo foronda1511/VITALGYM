@@ -1,7 +1,30 @@
+from datetime import datetime, timedelta
 import csv
 import os
 
 archivo = "csv/miembros.csv"
+
+def obtener_fecha_inicio():
+    return datetime.today().strftime("%Y-%m-%d")
+
+def obtener_fecha_fin(plan):
+    hoy = datetime.today()
+
+    if plan == "básico":
+        dias = 30
+    elif plan == "premium":
+        dias = 60
+    elif plan == "full":
+        dias = 90
+    else:
+        dias = 30  # por si acaso
+
+    fecha_fin = hoy + timedelta(days=dias)
+    return fecha_fin.strftime("%Y-%m-%d")
+
+def obtener_estado(fecha_fin_plan):
+    hoy = datetime.today().strftime("%Y-%m-%d")
+    return "ACTIVO" if fecha_fin_plan >= hoy else "INACTIVO"
 
 def asignar_id():
     if not os.path.exists(archivo):
@@ -24,32 +47,101 @@ def agregar_miembro():
     nuevo_id = ultimo_id + 1
 
     nombre = input("Nombre del usuario: ")
-    documento = float(input("Documento del usuario: "))
-    telefono = float(input("Telefono del usuario: "))
+
+    while True:
+        try:
+            documento = float(input("Documento del usuario: "))
+            if documento < 0:
+                print("ERROR: Número de documento negativo.")
+                continue
+            break
+        except:
+            print("Tú documento no puede ser letras.")
+            continue
+    while True:
+        try:
+            telefono = float(input("Telefono del usuario: "))
+            if telefono < 0:
+                print("ERROR: Número de telefono negativo.")
+                continue
+            break
+        except:
+            print("Tú numero de telefono no puede ser letras.")
+            continue
+        
     correo = input("Correo electronico del usuario: ")
+
     plan = input("Plan escogido por el usuario (BÁSICO | PREMIUM | FULL)").strip().lower()
+
+    fecha_inicio = obtener_fecha_inicio()
+    fecha_fin_plan = obtener_fecha_fin(plan)
+    estado = obtener_estado(fecha_fin_plan)
 
     archivo_existe = os.path.exists(archivo)
 
-    with open("csv/miembros.csv", "a", encoding="utf-8")as f:
+    with open(archivo, "a", encoding="utf-8")as f:
         writer = csv.writer(f)
 
         if not archivo_existe:
-            writer.writerow(["id","nombre","documento","telefono","correo","plan"])
+            writer.writerow(["id","nombre","documento","telefono","correo","plan","fecha_inicio","fecha_fin_plan","estado"])
 
-        writer.writerow([nuevo_id,nombre,documento,telefono,correo,plan])
+        writer.writerow([nuevo_id,nombre,documento,telefono,correo,plan,fecha_inicio,fecha_fin_plan,estado])
 
     print(f"\nMiembro agregado con ID: {nuevo_id}\n")
+
+def listar_miembro():
+
+    with open("csv/miembros.csv", "r", encoding="utf-8")as f:
+        lector = csv.DictReader(f)
+        for fila in lector:
+            print(f"\nmiembro con id:{fila["id"]}")
+            print(f"nombre: {fila["nombre"]}")
+            print(f"documento: {fila["documento"]}")
+            print(f"telefono: {fila["telefono"]}")
+            print(f"correo: {fila["correo"]}")
+            print(f"plan: {fila["plan"]}")
+            print(f"fecha de inicio: {fila["fecha_inicio"]}")
+            print(f"fecha final del plan: {fila["fecha_fin_plan"]}")
+            print(f"estado del miembro: {fila["estado"]}")
+            print("---------------------\n")
+
+def buscar_miembro():
+    while True:
+
+        buscar = input("\nNombre del usuario o escribe salir: ").strip().lower()
+        if buscar == "salir":
+            print("saliendo al menú.")
+            return
+
+        with open(archivo, newline="",encoding="utf-8")as f:
+            lector = csv.DictReader(f)
+            encontrado = False
+
+            for fila in lector:
+                if buscar ==  fila["nombre"].lower():
+                    print("Registro encontrado.\n")
+                    for clave, valor in fila.items():
+                        print(f"{clave}: {valor}")
+                    print()
+                    encontrado = True
+
+            if not encontrado:
+                print("No se encontro el miembro con ese nombre.")
+
+#def renovar_plan():
+
+
 
 def menu_miembro():
 
     while True:
 
-        print("=> MENÚ DE MIEMBRO.")
+        print("\n---- MENÚ DE MIEMBRO.----")
         print("Opción 1 -Registrar miembro")
         print("Opcion 2 -Listar miembros(estado).")
         print("Opción 3 -Buscar miembro.")
         print("Opción 4 -Renovar plan con pago.")
+        print("Opción 5 -Regresar al menú.")
 
         try:
             opcion = int(input("Qué opción deseas realizar: "))
@@ -57,5 +149,15 @@ def menu_miembro():
             print("No se permiten caracteres especiales.")
             continue
 
-        else: 
+        if opcion == 1:
+            agregar_miembro()
+        elif opcion == 2:
+            listar_miembro()
+        elif opcion == 3:
+            buscar_miembro()
+        elif opcion == 4:
+            print("")
+        elif opcion == 5:
+            return
+        else:
             print("Opcion no existe.")
