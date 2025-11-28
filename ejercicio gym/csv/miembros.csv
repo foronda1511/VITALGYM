@@ -1,2 +1,4 @@
 id,nombre,documento,telefono,correo,plan,fecha_inicio,fecha_fin_plan,estado,
-1,mateo,1001617065.0,3012809917.0,mateoforomora@gmail.com,full,2025-11-27,2026-02-25,ACTIVO
+1,mateo,1001617065.0,3012809917.0,mateoforomora@gmail.com,full,2025-11-27,2026-02-26,ACTIVO,
+2,yeral,1011511469.0,3023178973.0,yeral@gmail.com,full,2025-11-28,2026-02-26,ACTIVO,
+3,teo,1144.0,2657.0,adnatr,full,2025-11-28,2026-02-26,ACTIVO,

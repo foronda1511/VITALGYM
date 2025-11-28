@@ -29,7 +29,7 @@ def menu():
         elif opcion == 2:
             entrenamientos.print("f")
         elif opcion == 3:
-            asistencias.print("f")
+            asistencias.menu_asistencias()
         elif opcion == 4:
             pagos.print("f")
         elif opcion == 5:

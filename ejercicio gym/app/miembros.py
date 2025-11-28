@@ -128,9 +128,66 @@ def buscar_miembro():
             if not encontrado:
                 print("No se encontro el miembro con ese nombre.")
 
-#def renovar_plan():
+def renovar_plan():
+    print("\n--Renovar plan con pago. --")
 
+    while True:
+        print("Escribe (salir) para cancelar y volver al menú.")
+        buscar = input("Usuario a renovar plan: ").strip().lower()
+        if buscar == "salir":
+            print("Renovacion cancelada.")
+            return
+        with open(archivo,"r", newline="", encoding="utf-8")as f:
+            lector = csv.DictReader(f)
+            miembro_encontrado = False
 
+            for fila in lector:
+                if buscar == fila["nombre"].lower() or buscar == fila["id"]:
+                    miembro_encontrado = True
+                    print(f"\nMiembro encontrado: {fila['nombre']}")
+                    print(f"Plan actual: {fila['plan']}")
+                    print(f"Fecha de finalización actual: {fila['fecha_fin_plan']}")
+                    print(f"Estado actual: {fila['estado']}")
+
+                    dias_restantes = (datetime.strptime(fila['fecha_fin_plan'], "%Y-%m-%d") - datetime.today()).days
+                    
+                    if dias_restantes > 0:
+                        print(f"\nQuedan {dias_restantes} días para que se venza el plan actual.")
+                    
+                    opcion_renovar = input("\n¿Deseas renovar el plan? (si/no): ").strip().lower()
+                    
+                    if opcion_renovar == "si":
+                        plan_nuevo = input("\nNuevo plan (BÁSICO | PREMIUM | FULL): ").strip().lower()
+                        if plan_nuevo not in ["básico", "premium", "full"]:
+                            print("Plan no válido. Debes elegir entre BÁSICO, PREMIUM o FULL.\n")
+                            continue
+                        
+                        nueva_fecha_fin = obtener_fecha_fin(plan_nuevo)
+                        estado = "ACTIVO"  
+
+                        miembros = []
+
+                        with open(archivo, "r", encoding="utf-8") as f_read:
+                            lector = csv.DictReader(f_read)
+                            for fila in lector:
+                                if fila["id"] == fila["id"]:
+                                    fila["plan"] = plan_nuevo
+                                    fila["fecha_fin_plan"] = nueva_fecha_fin
+                                    fila["estado"] = estado
+                                miembros.append(fila)
+
+                        with open(archivo, "w", encoding="utf-8", newline="") as f_write:
+                            writer = csv.DictWriter(f_write, fieldnames=miembros[0].keys())
+                            writer.writeheader()
+                            writer.writerows(miembros)
+
+                        print(f"\nPlan renovado exitosamente para {fila['nombre']}. Nuevo plan: {plan_nuevo}, fecha de finalización: {nueva_fecha_fin}.")
+                    else:
+                        print("No se ha renovado el plan.")
+                    break
+
+            if not miembro_encontrado:
+                print("No se encontró un miembro con ese nombre o ID.")
 
 def menu_miembro():
 
@@ -156,7 +213,7 @@ def menu_miembro():
         elif opcion == 3:
             buscar_miembro()
         elif opcion == 4:
-            print("")
+            renovar_plan()
         elif opcion == 5:
             return
         else:
